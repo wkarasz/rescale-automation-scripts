@@ -1,3 +1,4 @@
+#!/bin/bash
 # Rescale script for building a SIF file
 source .config
 APITOKEN=$RESCALE_API_KEY
@@ -16,7 +17,7 @@ echo ${APIBASEURL}
   #sed -i.bak "s/DEF_FILE_ID/$DEF_FILE_ID/" submit.sh
 
 #All files in this directory will be zipped up as part of the job
-rescale-cli --profile fx submit -i submit.sh > logs.txt
+rescale-cli submit -i submit.sh > logs.txt
 
 #Get Job ID
 JOBIDTEMP=$(grep -rnw logs.txt -e 'Job.*: Saved' | sed 's/.*Job //')
@@ -24,13 +25,13 @@ JOBID=${JOBIDTEMP%:*}
 echo Job ID: $JOBID
 
 #Check status of job
-STATUS=$(rescale-cli --profile fx status -j $JOBID)
+STATUS=$(rescale-cli status -j $JOBID)
 #Looking for response: The status of job <jobid> is Completed
 bContinue=true
 while $bContinue
 do
   echo polling...\\r
-  STATUS=$(rescale-cli --profile fx status -j $JOBID)
+  STATUS=$(rescale-cli status -j $JOBID)
   if [[ "$STATUS" == *"Completed" ]]; then
     bContinue=false
   fi
