@@ -1,3 +1,4 @@
+#!/bin/bash
 # Submit a multi-software job (BYO Singularity + X)
 source .config
 
