@@ -1,0 +1,43 @@
+Bootstrap: docker
+From: rockylinux:8
+
+%labels
+  MAINTAINER Hexagon
+  WHATAMI Hexagon numerical simulation applications container (Rocky 8 latest)
+
+%files
+  linux-libc217-x86-64_Actran_2022.run /opt/hexagon/src/linux-libc217-x86-64_Actran_2022.run
+
+%environment
+  export LC_ALL=C
+  export ACTRAN_PATH=/opt/hexagon/actran
+  export PATH=${ACTRAN_PATH}/Actran_2022/bin:${ACTRAN_PATH}/Actran_2022/mpi/intelmpi/bin:${ACTRAN_PATH}/Actran_2022/mpi/intelmpi/libfabric/bin:${PATH}
+  export LD_LIBRARY_PATH=${ACTRAN_PATH}/Actran_2022/mesa/lib:${ACTRAN_PATH}/Actran_2022/lib:${ACTRAN_PATH}/Actran_2022/mpi/intelmpi/lib:${ACTRAN_PATH}/Actran_2022/mpi/intelmpi/libfabric/lib:${LD_LIBRARY_PATH}
+
+%post
+  # Mount points
+  mkdir -p /data /projects /scratch 
+  #/opt/hexagon/src
+
+  # Update the base os
+  dnf -y update &&\
+  dnf -y install dnf-plugins-core && dnf config-manager --set-enabled powertools && dnf -y install epel-release && dnf repolist
+  dnf -y install xorg-x11-utils
+  dnf -y install mesa-libGLU*.x86_64 mesa-libGLw-devel* mesa-dri-drivers glx-utils
+  dnf -y install openssh openssh-clients rsync redhat-lsb-core redhat-lsb-cxx python3.8 bash vim emacs valgrind libxml2 libxslt libXt-devel mesa-libGL mesa-libGLU libxcb xcb-proto expat bison byacc m4 gcc gcc-c++ gcc-gfortran make texinfo flex automake openssl libtool-ltdl libxkbcommon-x11 xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil telnet bind-utils bzip2 wget curl libatomic_ops libXext &&\
+  dnf -y install epel-release && dnf repolist && dnf -y install p7zip &&\
+  dnf clean all
+
+  # Install and set needed environment
+  export ACTRAN_SRC=linux-libc217-x86-64_Actran_2022.run
+  export ACTRAN_PATH=/opt/hexagon/actran
+  export MSC_LICENSE_FILE=dummy
+  #wget -c https://hexagon-apps.s3.amazonaws.com/applications/2022.1/${ACTRAN_SRC} -P /opt/hexagon/src
+  mkdir /opt/hexagon/actran && sh /opt/hexagon/src/$ACTRAN_SRC --nox11 confirm=no addqa=yes
+  unset language
+
+  # Clean up
+  rm -f /opt/hexagon/src/${ACTRAN_SRC}
+  mv libfontconfig.so.1.11.1 /usr/lib64/
+  ln -sf /usr/lib64/libfontconfig.so.1.11.1 /usr/lib64/libfontconfig.so
+  ln -sf /usr/lib64/libfontconfig.so.1.11.1 /usr/lib64/libfontconfig.so.1
