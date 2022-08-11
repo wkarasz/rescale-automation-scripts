@@ -42,12 +42,14 @@ done
 echo [Update] $STATUS
 
 # Perhaps a race condition here, without wait, FILEID may return empty
+echo [Wait 45s]
 sleep 45s
 
 #Get the File ID for the generated SIF file
 FILEID=$(curl --location --request GET "${APIBASEURL}/api/v2/jobs/${JOBID}/files/" \
 --header "Authorization: Token ${APITOKEN}" \
 --header 'Content-Type: application/json' | jq '.results[] | select(.name|test("actran.*sif")) | .id' | tr -d '"')
+echo File ID: ${FILEID}
 echo ${FILEID} > .fileid
 
 #Move the file to the shared file directory

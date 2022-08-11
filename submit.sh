@@ -8,3 +8,6 @@
 #RESCALE_EXISTING_FILES=jRjiDm
 #RESCALE_LOW_PRIORITY=true
 singularity build --fakeroot actran_build_$(date +'%Y%m%d').sif hexagon_software-4.def
+rm -rf .git
+rm -rf linux*.run
+
