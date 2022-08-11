@@ -41,6 +41,9 @@ done
 
 echo [Update] $STATUS
 
+# Perhaps a race condition here, without wait, FILEID may return empty
+sleep 45s
+
 #Get the File ID for the generated SIF file
 FILEID=$(curl --location --request GET "${APIBASEURL}/api/v2/jobs/${JOBID}/files/" \
 --header "Authorization: Token ${APITOKEN}" \
